@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "nexus-c2"
+version = "0.1.0"
+description = "Zero-Trust Multi-Agent C2 Platform with Context Budgeting & Envelope Encryption"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "pydantic>=2.0.0",
+    "cryptography>=41.0.0",
+    "rich>=13.0.0",
+    "typer>=0.9.0",
+]
+
+[project.scripts]
+nexus-c2 = "nexus_c2.main:app"
+
+[tool.setuptools.packages.find]
+where = ["src"]
