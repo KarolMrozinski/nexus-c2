@@ -7,6 +7,8 @@ from nexus_c2.core.models import TokenBudget
 from nexus_c2.crypto.envelope import EnvelopeCryptoEngine
 from nexus_c2.core.budget import TokenBudgetManager
 from nexus_c2.core.models import TokenBudget
+from nexus_c2.core.orchestrator import MultiAgentOrchestrator
+from nexus_c2.core.models import AgentRole, TokenBudget
 
 app = typer.Typer(help="NEXUS-C2: Zero-Trust Multi-Agent C2 Architecture")
 console = Console()
@@ -69,6 +71,48 @@ def test_budget() -> None:
     # Test 2: Drugie zapytanie przekracza budżet finansowy
     ok2, msg2 = manager.authorize_execution("AGENT_WORKER_ALPHA", estimated_tokens=1500, estimated_cost=0.04)
     console.print(f"Task 2 (1500 tokens, $0.04): [{'green' if ok2 else 'red'}]{msg2}[/{'green' if ok2 else 'red'}]")
+
+@app.command(name="run-flow")
+def run_orchestration_flow() -> None:
+    """Uruchamia sekwencję orkiestracji przepływu zadań między agentami Zero-Trust."""
+    console.print(
+        Panel.fit(
+            "[bold cyan]⚡ NEXUS-C2 Multi-Agent Orchestration Flow[/bold cyan]\n[dim]DAG Task Dispatch with Zero-Trust & Budget Enforcement[/dim]",
+            border_style="cyan",
+        )
+    )
+
+    orchestrator = MultiAgentOrchestrator()
+
+    # Rejestracja agentów
+    orchestrator.register_agent(
+        "ORCHESTRATOR_MAIN",
+        AgentRole.ORCHESTRATOR,
+        TokenBudget(max_token_limit=8192, max_cost_usd=1.0),
+    )
+    orchestrator.register_agent(
+        "WORKER_ANALYSIS",
+        AgentRole.ANALYSIS_WORKER,
+        TokenBudget(max_token_limit=4096, max_cost_usd=0.20),
+    )
+
+    task = {
+        "action": "THREAT_INTELLIGENCE_SCAN",
+        "target": "c5isr-internal-network",
+        "depth": "FULL_AUDIT",
+    }
+
+    with console.status("[bold green]Orkiestrowanie zadania i szyfrowanie Zero-Trust..."):
+        result = orchestrator.dispatch_task(
+            sender_id="ORCHESTRATOR_MAIN",
+            recipient_id="WORKER_ANALYSIS",
+            task_payload=task,
+            estimated_tokens=512,
+            estimated_cost=0.01,
+        )
+
+    console.print("\n[bold green]✔ Wynik Orkiestracji Przepływu Zadań:[/bold green]")
+    console.print_json(data=result)
 
 if __name__ == "__main__":
     app()
