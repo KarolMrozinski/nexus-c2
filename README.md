@@ -30,8 +30,9 @@ graph TD
 
     Orchestrator -->|1. Request Authorization| BudgetManager
     BudgetManager -->|2. Approved / Rejected| Orchestrator
-    Orchestrator -->|3. Encrypted Envelope (AES-256-GCM)| AnalysisWorker
-    AnalysisWorker -->|4. Decrypt & Execute Payload| AnalysisWorker
+    Orchestrator -->|3. Encrypted Envelope AES-256-GCM| AnalysisWorker
+    AnalysisWorker -->|4. Decrypt and Execute Payload| AnalysisWorker
 
     class BudgetManager crypto;
     class Orchestrator,AnalysisWorker agent;
+```
